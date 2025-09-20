@@ -1,0 +1,24 @@
+# Ignore database config
+
+.env
+
+# Ignore logs and temp files
+*.log
+*.tmp
+*.cache
+
+# Ignore IDE/project files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Composer dependencies
+/vendor/
+
+# Node dependencies (if any frontend uses npm)
+node_modules/
