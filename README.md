@@ -74,6 +74,7 @@ SMS/
 │-- view_classes.php # Show all classes
 │-- view_students.php# Show all Students data
 │-- .gitignore       # Git ignored files
+│-- README.md        # Project documentation
 ```
 
 ---
