@@ -24,7 +24,7 @@ cd SMS
 ```
 
 ### 2️⃣ Setup environment variables
-Create a `.env` file:
+Create a `.env` file.
 Update `.env` with your database credentials:
 ```env
 DB_HOST=localhost
@@ -75,7 +75,6 @@ SMS/
 
 ---
  
----
 
 ## 👨‍💻 Author
 
