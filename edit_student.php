@@ -7,23 +7,47 @@ if (!isset($_GET['id'])) {
 
 $id = intval($_GET['id']);
 $student = $conn->query("SELECT * FROM students WHERE id = $id")->fetch_assoc();
+$message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $roll_no = $_POST['roll_no'];
-    $class_id = $_POST['class_id'];
+    $name = trim($_POST['name']);
+    $roll_no = trim($_POST['roll_no']);  
+    $class_id = intval($_POST['class_id']);
     $dob = $_POST['dob'];
-    $parent_contact = $_POST['parent_contact'];
-    $address = $_POST['address'];
+    $parent_contact = trim($_POST['parent_contact']);
+    $address = trim($_POST['address']);
 
-    $stmt = $conn->prepare("UPDATE students SET name=?, roll_no=?, class_id=?, dob=?, parent_contact=?, address=? WHERE id=?");
-    $stmt->bind_param("siisssi", $name, $roll_no, $class_id, $dob, $parent_contact, $address, $id);
-
-    if ($stmt->execute()) {
-        header("Location: view_students.php");
-        exit();
+    // PHP Validations
+    if (!preg_match("/^[A-Za-z ]+$/", $name)) {
+        $message = "❌ Invalid name.";
+    } elseif (!ctype_digit($roll_no) || strlen($roll_no) < 1) {
+        $message = "❌ Roll number must be numeric and valid.";
+    } elseif (!preg_match("/^[0-9]{10}$/", $parent_contact)) {
+        $message = "❌ Parent contact must be 10 digits.";
+    } elseif (strlen($address) < 5) {
+        $message = "❌ Address too short.";
     } else {
-        echo "Error: " . $stmt->error;
+        // Check duplicate roll number in same class (exclude current student)
+        $check = $conn->prepare("SELECT id FROM students WHERE roll_no = ? AND class_id = ? AND id != ?");
+        $check->bind_param("sii", $roll_no, $class_id, $id);
+        $check->execute();
+        $check->store_result();
+
+        if ($check->num_rows > 0) {
+            $message = "❌ Roll number already exists in this class.";
+        } else {
+            // Update student
+            $stmt = $conn->prepare("UPDATE students SET name=?, roll_no=?, class_id=?, dob=?, parent_contact=?, address=? WHERE id=?");
+            $stmt->bind_param("ssisssi", $name, $roll_no, $class_id, $dob, $parent_contact, $address, $id);
+
+            if ($stmt->execute()) {
+                $message = "✅ Student updated successfully!";
+            } else {
+                $message = "❌ Error: " . $stmt->error;
+            }
+            $stmt->close();
+        }
+        $check->close();
     }
 }
 ?>
@@ -35,12 +59,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Edit Student</h2>
-    <form method="POST" class="form">
-        <input type="text" name="name" value="<?php echo $student['name']; ?>" required>
-        <input type="number" name="roll_no" value="<?php echo $student['roll_no']; ?>" required>
+    <h2>✏️ Edit Student</h2>
 
-        <select name="class_id" required>
+    <!-- Show success or error -->
+    <?php if ($message): ?>
+       <p class="message <?php echo strpos($message,'✅') !== false ? 'success':'error'; ?>">
+           <?php echo $message; ?>
+       </p>
+    <?php endif; ?>
+
+    <form method="POST" class="form" onsubmit="return validateForm()">
+        <label for="name">Student Name:</label>
+        <input type="text" name="name" id="name" value="<?php echo htmlspecialchars($student['name']); ?>" required>
+        <span id="name_error" class="error"></span>
+       
+        <label for="roll_no">Roll Number:</label>
+        <input type="text" name="roll_no" id="roll_no" value="<?php echo htmlspecialchars($student['roll_no']); ?>" required>
+        <span id="roll_error" class="error"></span>
+
+        <label for="class_id">Class:</label>
+        <select name="class_id" id="class_id" required>
             <?php
             $classes = $conn->query("SELECT * FROM classes");
             while ($row = $classes->fetch_assoc()) {
@@ -49,14 +87,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             ?>
         </select>
+        <span id="class_error" class="error"></span>
 
-        <input type="date" name="dob" value="<?php echo $student['dob']; ?>" required>
-        <input type="text" name="parent_contact" value="<?php echo $student['parent_contact']; ?>" required>
-        <textarea name="address" required><?php echo $student['address']; ?></textarea>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" name="dob" id="dob" value="<?php echo $student['dob']; ?>" required>
+        <span id="dob_error" class="error"></span>
+       
+        <label for="parent_contact">Parent Contact:</label>
+        <input type="text" name="parent_contact" id="parent_contact" value="<?php echo $student['parent_contact']; ?>" required>
+        <span id="phone_error" class="error"></span>
+
+        <label for="address">Address:</label>
+        <textarea name="address" id="address" required><?php echo htmlspecialchars($student['address']); ?></textarea>
+        <span id="address_error" class="error"></span>
 
         <button type="submit" class="btn">Update Student</button>
     </form>
 
     <a href="view_students.php" class="btn back">⬅ Back</a>
+
+    <script>
+    function validateForm() {
+        let valid = true;
+        document.querySelectorAll(".error").forEach(e => e.textContent = "");
+
+        let name = document.getElementById("name").value;
+        if (!/^[A-Za-z ]+$/.test(name)) {
+            document.getElementById("name_error").textContent = "Name must contain only letters and spaces.";
+            valid = false;
+        }
+
+        let roll = document.getElementById("roll_no").value;
+        if (!/^[0-9]+$/.test(roll)) {
+            document.getElementById("roll_error").textContent = "Roll Number must be numeric.";
+            valid = false;
+        }
+
+        let class_id = document.getElementById("class_id").value;
+        if (class_id === "") {
+            document.getElementById("class_error").textContent = "Please select a class.";
+            valid = false;
+        }
+
+        let dob = new Date(document.getElementById("dob").value);
+        let today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        let m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) { age--; }
+        if (age < 3 || age > 20) {
+            document.getElementById("dob_error").textContent = "Age must be between 3 and 20 years.";
+            valid = false;
+        }
+
+        let phone = document.getElementById("parent_contact").value;
+        if (!/^[0-9]{10}$/.test(phone)) {
+            document.getElementById("phone_error").textContent = "Enter a valid 10-digit phone number.";
+            valid = false;
+        }
+
+        let address = document.getElementById("address").value.trim();
+        if (address.length < 5) {
+            document.getElementById("address_error").textContent = "Address must be at least 5 characters.";
+            valid = false;
+        }
+
+        return valid;
+    }
+    </script>
 </body>
 </html>

@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-   <h2>Add New Student</h2>
+   <h2>➕ Add New Student</h2>
 
    <!-- Show success or error -->
    <?php if ($message): ?>
@@ -62,14 +62,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
            <?php echo $message; ?>
        </p>
    <?php endif; ?>
-
+    
    <form method="POST" class="form" onsubmit="return validateForm()">
+       <label for="name">Student Name:</label>
        <input type="text" name="name" id="name" placeholder="Student Name" required>
        <span id="name_error" class="error"></span>
-
+       
+       <label for="roll_no">Roll Number:</label>
        <input type="text" name="roll_no" id="roll_no" placeholder="Roll Number" required>
        <span id="roll_error" class="error"></span>
-
+      
+       <label for="class_id">Class:</label>
        <select name="class_id" id="class_id" required>
            <option value="">Select Class</option>
            <?php
@@ -80,18 +83,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
            ?>
        </select>
        <span id="class_error" class="error"></span>
-
+      
+       <label for="dob">Date of Birth:</label>
        <input type="date" name="dob" id="dob" required>
        <span id="dob_error" class="error"></span>
-
+        
+       <label for="parent_contact">Parent Contact:</label>
        <input type="text" name="parent_contact" id="parent_contact" placeholder="Parent Contact" required>
        <span id="phone_error" class="error"></span>
-
+    
+       <label for="address">Address:</label>
        <textarea name="address" id="address" placeholder="Address" required></textarea>
        <span id="address_error" class="error"></span>
 
        <button type="submit" class="btn">Add Student</button>
    </form>
+
 
    <a href="index.php" class="btn back">⬅ Back</a>
 

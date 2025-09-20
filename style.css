@@ -58,28 +58,49 @@ h2 {
 table {
     width: 90%;
     margin: 20px auto;
-    border-collapse: collapse;
+    border-collapse: separate; /* needed for border-radius */
+    border-spacing: 0; /* remove extra spacing */
     background: #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px; /* rounded corners */
+    overflow: hidden; /* clip the corners */
 }
+
 th, td {
-    padding: 12px;
-    border: 1px solid #ddd;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
     text-align: center;
 }
+
 th {
     background: #4CAF50;
     color: #fff;
+    font-weight: bold;
 }
-tr:nth-child(even) { background: #f9f9f9; }
+
+tr:nth-child(even) { 
+    background: #f9f9f9; 
+}
+
+tr:hover {
+    background: #edf1ef; /* subtle hover effect */
+    transition: background 0.3s;
+}
+
+/* Round only the top and bottom corners */
+
+
 
 /* Form */
 .form {
-    width: 60%;
+    width: 50%;
     margin: 20px auto;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 3px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Shadow */
+    border-radius: 10px;
+    padding: 20px;
 }
 .form input,
 .form select,

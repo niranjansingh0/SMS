@@ -10,9 +10,10 @@
     </style>
 </head>
 <body>
-    <h2>Student Records</h2>
+    <h2>📋Student Records</h2>
 
     <form method="GET" class="form">
+        <label for="class_id">Filter by Class:</label>
         <select name="class_id" required>
             <option value="">Select Class</option>
             <?php
