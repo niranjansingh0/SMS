@@ -20,5 +20,5 @@ Thumbs.db
 # Composer dependencies
 /vendor/
 
-# Node dependencies (if any frontend uses npm)
+# Node dependencies
 node_modules/

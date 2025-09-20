@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-    <h2>📋Student Records</h2>
+    <h2>📋 Student Records</h2>
 
     <form method="GET" class="form">
         <label for="class_id">Filter by Class:</label>
@@ -44,6 +44,7 @@
                 <th>Section</th>
                 <th>DOB</th>
                 <th>Parent Contact</th>
+                <th>Address</th>
                 <th>Actions</th>
               </tr>";
         $serial = 1;
@@ -56,6 +57,7 @@
                     <td>".$row['section']."</td>
                     <td>".$row['dob']."</td>
                     <td>".$row['parent_contact']."</td>
+                    <td>".$row['address']."</td>
                     <td>
                         <a href='edit_student.php?id=".$row['id']."' class='btn btn-sm edit'>✏ Edit</a>
                         <a href='delete_student.php?id=".$row['id']."' class='btn btn-sm delete' onclick=\"return confirm('Are you sure you want to delete this student?');\">🗑 Delete</a>
@@ -78,12 +80,12 @@
                            WHERE s.class_id = $class_id");
             $detailsArray = [];
             while ($row = $detailsResult->fetch_assoc()) {
-            $detailsArray[] = $row;
+                $detailsArray[] = $row;
             }
             echo "<script>
             var students = ".json_encode($detailsArray).";
             var printWindow = window.open('', '', 'height=600,width=900');
-            printWindow.document.write('<h2>Student Details</h2><table border=\"1\" cellpadding=\"5\"><tr><th>Name</th><th>Roll No</th><th>Class</th><th>Section</th><th>DOB</th><th>Parent Contact</th></tr>');
+            printWindow.document.write('<h2>Student Details</h2><table border=\"1\" cellpadding=\"5\"><tr><th>Name</th><th>Roll No</th><th>Class</th><th>Section</th><th>DOB</th><th>Parent Contact</th><th>Address</th></tr>');
             for(var i=0; i<students.length; i++) {
             printWindow.document.write('<tr>' +
                 '<td>' + students[i].name + '</td>' +
@@ -92,6 +94,7 @@
                 '<td>' + students[i].section + '</td>' +
                 '<td>' + students[i].dob + '</td>' +
                 '<td>' + students[i].parent_contact + '</td>' +
+                '<td>' + students[i].address + '</td>' +
             '</tr>');
             }
             printWindow.document.write('</table>');
