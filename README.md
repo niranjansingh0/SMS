@@ -24,11 +24,7 @@ cd SMS
 ```
 
 ### 2️⃣ Setup environment variables
-Copy create a `.env` file:
-```bash
-cp .env
-```
-
+Create a `.env` file:
 Update `.env` with your database credentials:
 ```env
 DB_HOST=localhost
@@ -45,7 +41,7 @@ CREATE DATABASE school_db;
 
 (Optional) Import schema if Required:
 ```bash
-mysql -u root -p school_db < database.sql
+mysql -u root -p school_db < school_db.sql
 ```
 
 ### 4️⃣ Run the project
@@ -61,7 +57,7 @@ http://localhost/SMS
 ## 📂 Project Structure
 ```
 SMS/
-│-- db.php           # Database connection (loads from .env)
+│-- db.php           # Database connection 
 │-- .env             # Environment variables (ignored in Git)
 │-- style.css        # Stylesheet
 │-- index.php        # Dashboard / Home
