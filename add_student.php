@@ -151,5 +151,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
        return valid;
    }
    </script>
+   <!-- Developed by Niranjan singh -->
 </body>
 </html>
