@@ -45,6 +45,10 @@ h2 {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
+.button-container {
+    text-align: center; 
+    margin-top: 10px;   
+}
 
 /* Button Variants */
 .btn.green  { background: linear-gradient(135deg, #28a745, #218838); }
