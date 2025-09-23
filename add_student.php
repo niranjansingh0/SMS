@@ -95,6 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
        <label for="address">Address:</label>
        <textarea name="address" id="address" placeholder="Address" required></textarea>
        <span id="address_error" class="error"></span>
+       
        <div class="button-container">
        <button type="submit" class="btn">Add Student</button>
        </div>

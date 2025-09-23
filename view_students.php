@@ -23,6 +23,7 @@ include 'db.php';
             }
             ?>
         </select>
+
         <div class="button-container">
         <button type="submit" name="filter_submit" class="btn">Filter</button>
         </div>

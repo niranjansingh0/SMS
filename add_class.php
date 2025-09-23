@@ -64,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="section">Section:</label>
         <input type="text" name="section" id="section" placeholder="Section (e.g. A)" required>
         <span id="section_error" class="error"></span>
+        
         <div class="button-container">
         <button type="submit" class="btn">Add Class</button>
         </div>

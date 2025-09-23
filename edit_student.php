@@ -134,8 +134,9 @@ if (isset($_POST['submit'])) {
 
     <label for="address">Address:</label>
     <textarea name="address" id="address" required><?php echo htmlspecialchars($student['address']); ?></textarea>
-
+    <div class="button-container">
     <button type="submit" name="submit" class="btn">Update Student</button>
+    </div>
 </form>
 
 <a href="view_students.php" class="btn back">⬅ Back</a>

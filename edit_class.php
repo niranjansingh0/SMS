@@ -96,8 +96,9 @@ if (isset($_POST['class_name'], $_POST['section'], $_POST['id'])) {
         <label for="section">Section:</label>
         <input type="text" name="section" id="section" value="<?php echo htmlspecialchars($row['section']); ?>" required>
         <span id="section_error" class="error"></span>
-
+        <div class="button-container">
         <button type="submit" class="btn">Update</button>
+        </div>
     </form>
 
     <a href="view_classes.php" class="btn back">⬅ Back</a>
