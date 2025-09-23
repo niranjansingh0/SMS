@@ -4,37 +4,35 @@
 <head>
     <title>View Students</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .edit { background: #007bff; color: #fff; } 
-        .delete { background: #dc3545; color: #fff; }
-    </style>
 </head>
 <body>
     <h2>📋 Student Records</h2>
 
-    <form method="GET" class="form">
+    <form method="POST" class="form">
         <label for="class_id">Filter by Class:</label>
         <select name="class_id" required>
             <option value="">Select Class</option>
             <?php
             $result = $conn->query("SELECT * FROM classes");
             while ($row = $result->fetch_assoc()) {
-                $selected = (isset($_GET['class_id']) && $_GET['class_id'] == $row['id']) ? "selected" : "";
+                $selected = (isset($_POST['class_id']) && $_POST['class_id'] == $row['id']) ? "selected" : "";
                 echo "<option value='".$row['id']."' $selected>".$row['class_name']." - ".$row['section']."</option>";
             }
             ?>
         </select>
-        <button type="submit" class="btn">Filter</button>
+        <button type="submit" name="filter_submit" class="btn">Filter</button>
     </form>
 
-    <?php
-    if (isset($_GET['class_id'])) {
-        $class_id = intval($_GET['class_id']);
-        $result = $conn->query("SELECT s.*, c.class_name, c.section 
-                                FROM students s 
-                                JOIN classes c ON s.class_id = c.id
-                                WHERE s.class_id = $class_id");
+<?php
+if (isset($_POST['filter_submit']) && !empty($_POST['class_id'])) {
+    $class_id = intval($_POST['class_id']);
 
+    $result = $conn->query("SELECT s.*, c.class_name, c.section 
+                            FROM students s 
+                            JOIN classes c ON s.class_id = c.id
+                            WHERE s.class_id = $class_id");
+
+    if ($result->num_rows > 0) {
         echo "<table>";
         echo "<tr>
                 <th>Serial</th>
@@ -66,27 +64,39 @@
             $serial++;
         }
         echo "</table>";
+        ?>
 
-        // Print button to print all student details
-        echo "<form method='post' action='' style='margin-top:10px;'>
-            <button type='submit' name='print_details' class='btn print'>🖨 Print All Details</button>
-        </form>";
+        <!-- Print Button Form -->
+        <form method="POST" style="margin-top:10px;">
+            <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
+            <button type="submit" name="print_details" class="btn print">🖨 Print All Details</button>
+        </form>
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['print_details'])) {
-            // Fetch all student details for printing
-            $detailsResult = $conn->query("SELECT s.*, c.class_name, c.section 
-                           FROM students s 
-                           JOIN classes c ON s.class_id = c.id
-                           WHERE s.class_id = $class_id");
-            $detailsArray = [];
-            while ($row = $detailsResult->fetch_assoc()) {
-                $detailsArray[] = $row;
-            }
-            echo "<script>
-            var students = ".json_encode($detailsArray).";
-            var printWindow = window.open('', '', 'height=600,width=900');
-            printWindow.document.write('<h2>Student Details</h2><table border=\"1\" cellpadding=\"5\"><tr><th>Name</th><th>Roll No</th><th>Class</th><th>Section</th><th>DOB</th><th>Parent Contact</th><th>Address</th></tr>');
-            for(var i=0; i<students.length; i++) {
+    <?php
+    } else {
+        echo "<p class='center-message'>No students found for this class.</p>";
+    }
+}
+
+// Handle Print Button
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['print_details']) && !empty($_POST['class_id'])) {
+    $class_id = intval($_POST['class_id']); 
+
+    $detailsResult = $conn->query("SELECT s.*, c.class_name, c.section 
+                                   FROM students s 
+                                   JOIN classes c ON s.class_id = c.id
+                                   WHERE s.class_id = $class_id"); 
+
+    $detailsArray = [];
+    while ($row = $detailsResult->fetch_assoc()) {
+        $detailsArray[] = $row;
+    }
+
+    echo "<script>
+        var students = ".json_encode($detailsArray).";
+        var printWindow = window.open('', '', 'height=600,width=900');
+        printWindow.document.write('<h2>Student Details</h2><table border=\"1\" cellpadding=\"5\"><tr><th>Name</th><th>Roll No</th><th>Class</th><th>Section</th><th>DOB</th><th>Parent Contact</th><th>Address</th></tr>');
+        for(var i=0; i<students.length; i++) {
             printWindow.document.write('<tr>' +
                 '<td>' + students[i].name + '</td>' +
                 '<td>' + students[i].roll_no + '</td>' +
@@ -96,15 +106,15 @@
                 '<td>' + students[i].parent_contact + '</td>' +
                 '<td>' + students[i].address + '</td>' +
             '</tr>');
-            }
-            printWindow.document.write('</table>');
-            printWindow.document.close();
-            printWindow.print();
-            </script>";
         }
-    }
-    ?>
+        printWindow.document.write('</table>');
+        printWindow.document.close();
+        printWindow.print();
+    </script>";
+}
 
-    <a href="index.php" class="btn back">⬅ Back</a>
+?>
+
+<a href="index.php" class="btn back">⬅ Back</a>
 </body>
 </html>
