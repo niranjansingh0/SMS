@@ -36,11 +36,15 @@
                     <td>".$row['class_name']."</td>
                     <td>".$row['section']."</td>
                     <td>
-                        <a href='edit_class.php?id=".$row['id']."' class='btn btn-sm edit'>✏ Edit</a>
-                        <a href='delete_class.php?id=".$row['id']."' 
-                           class='btn btn-sm delete' 
-                           onclick='return confirm(\"Are you sure you want to delete this class?\");'>
-                           🗑 Delete</a>
+                       <form method='POST' action='edit_class.php' style='display:inline;'>
+                           <input type='hidden' name='id' value='".$row['id']."'>
+                           <button type='submit' class='btn btn-sm edit'>✏ Edit</button>
+                       </form>
+                       <form method='POST' action='delete_class.php' style='display:inline;' onsubmit=\"return confirm('Are you sure you want to delete this class?');\">
+                           <input type='hidden' name='id' value='".$row['id']."'>
+                           <button type='submit' class='btn btn-sm delete'>🗑 Delete</button>
+                       </form>
+                
                     </td>
                   </tr>";
             $serial++; 

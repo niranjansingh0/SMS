@@ -1,59 +1,75 @@
-<?php include 'db.php'; ?>
+<?php 
+include 'db.php';
 
-<?php
 $message = "";
-$row = null;
+$row = ['id'=>'','class_name'=>'','section'=>'']; // default values
 
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $result = $conn->query("SELECT * FROM classes WHERE id=$id");
-    $row = $result->fetch_assoc();
-    if (!$row) {
-        die("Class not found.");
+$id = null;
+
+// Load class data if ID exists via POST (from edit button)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+    $id = intval($_POST['id']);
+
+    $stmt = $conn->prepare("SELECT * FROM classes WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = $result->fetch_assoc();
+    if ($data) {
+        $row = $data;
+    } else {
+        // ID not found in DB
+        $id = null; // treat as invalid
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    $id = intval($_POST['id']);
-    $class_name = trim($_POST['class_name']);
-    $section = trim($_POST['section']);
-
-    // PHP Validations
-    if ($class_name == "" || $section == "") {
-        $message = "❌ Class Name and Section are required.";
-    } elseif (!preg_match("/^[A-Za-z0-9 ]+$/", $class_name)) {
-        $message = "❌ Class Name can only contain letters, numbers, and spaces.";
-    } elseif (!preg_match("/^[A-Za-z]$/", $section)) {
-        $message = "❌ Section must be a single letter.";
+// Handle form submission (only allow update if ID exists)
+if (isset($_POST['class_name'], $_POST['section'], $_POST['id'])) {
+    if (empty($_POST['id']) || $id === null) {
+        $message = "❌ Class not found.";
     } else {
-        // Check duplicate class + section (excluding current id)
-        $check = $conn->prepare("SELECT id FROM classes WHERE class_name=? AND section=? AND id != ?");
-        $check->bind_param("ssi", $class_name, $section, $id);
-        $check->execute();
-        $result = $check->get_result();
+        $id = intval($_POST['id']);
+        $class_name = trim($_POST['class_name']);
+        $section = trim($_POST['section']);
 
-        if ($result->num_rows > 0) {
-            $message = "❌ Class <b>$class_name $section</b> already exists!";
+        // PHP Validations
+        if ($class_name == "" || $section == "") {
+            $message = "❌ Class Name and Section are required.";
+        } elseif (!preg_match("/^[A-Za-z0-9 ]+$/", $class_name)) {
+            $message = "❌ Class Name can only contain letters, numbers, and spaces.";
+        } elseif (!preg_match("/^[A-Za-z]$/", $section)) {
+            $message = "❌ Section must be a single letter.";
         } else {
-            // Update class
-            $stmt = $conn->prepare("UPDATE classes SET class_name=?, section=? WHERE id=?");
-            $stmt->bind_param("ssi", $class_name, $section, $id);
+            // Check duplicate class + section (excluding current id)
+            $check = $conn->prepare("SELECT id FROM classes WHERE class_name=? AND section=? AND id != ?");
+            $check->bind_param("ssi", $class_name, $section, $id);
+            $check->execute();
+            $result = $check->get_result();
 
-            if ($stmt->execute()) {
-                $message = "✅ Class Updated Successfully!";
+            if ($result->num_rows > 0) {
+                $message = "❌ Class <b>$class_name $section</b> already exists!";
             } else {
-                $message = "❌ Error: " . $stmt->error;
-            }
-            $stmt->close();
-        }
-        $check->close();
-    }
+                // Update class
+                $stmt = $conn->prepare("UPDATE classes SET class_name=?, section=? WHERE id=?");
+                $stmt->bind_param("ssi", $class_name, $section, $id);
 
-    // Refresh the $row values after update to reflect changes in the form
-    $row['class_name'] = $class_name;
-    $row['section'] = $section;
+                if ($stmt->execute()) {
+                    $message = "✅ Class Updated Successfully!";
+                } else {
+                    $message = "❌ Error: " . $stmt->error;
+                }
+                $stmt->close();
+            }
+            $check->close();
+        }
+
+        // Refresh form values
+        $row['class_name'] = $class_name;
+        $row['section'] = $section;
+    }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html>

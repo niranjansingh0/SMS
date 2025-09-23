@@ -1,4 +1,6 @@
-<?php include 'db.php'; ?>
+<?php 
+include 'db.php'; 
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,6 +10,7 @@
 <body>
     <h2>📋 Student Records</h2>
 
+    <!-- Filter by class -->
     <form method="POST" class="form">
         <label for="class_id">Filter by Class:</label>
         <select name="class_id" required>
@@ -57,22 +60,27 @@ if (isset($_POST['filter_submit']) && !empty($_POST['class_id'])) {
                     <td>".$row['parent_contact']."</td>
                     <td>".$row['address']."</td>
                     <td>
-                        <a href='edit_student.php?id=".$row['id']."' class='btn btn-sm edit'>✏ Edit</a>
-                        <a href='delete_student.php?id=".$row['id']."' class='btn btn-sm delete' onclick=\"return confirm('Are you sure you want to delete this student?');\">🗑 Delete</a>
+                        <form method='POST' action='edit_student.php' style='display:inline;'>
+                            <input type='hidden' name='id' value='".$row['id']."'>
+                            <button type='submit' class='btn btn-sm edit'>✏ Edit</button>
+                        </form>
+                        <form method='POST' action='delete_student.php' style='display:inline;' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                            <input type='hidden' name='id' value='".$row['id']."'>
+                            <button type='submit' class='btn btn-sm delete'>🗑 Delete</button>
+                        </form>
+
                     </td>
                   </tr>";
             $serial++;
         }
         echo "</table>";
-        ?>
 
-        <!-- Print Button Form -->
-        <form method="POST" style="margin-top:10px;">
-            <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
-            <button type="submit" name="print_details" class="btn print">🖨 Print All Details</button>
-        </form>
+        // Print Button Form
+        echo "<form method='POST' style='margin-top:10px;'>
+                <input type='hidden' name='class_id' value='".$class_id."'>
+                <button type='submit' name='print_details' class='btn print'>🖨 Print All Details</button>
+              </form>";
 
-    <?php
     } else {
         echo "<p class='center-message'>No students found for this class.</p>";
     }
