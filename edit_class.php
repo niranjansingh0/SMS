@@ -24,11 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 }
 
 // Handle form submission 
-if (isset($_POST['class_name'], $_POST['section'], $_POST['id'])) {
+if (isset($_POST['submit'])) {
     if (empty($_POST['id']) || $id === null) {
         $message = "❌ Class not found.";
     } else {
-        $id = intval($_POST['id']);
         $class_name = trim($_POST['class_name']);
         $section = trim($_POST['section']);
 
@@ -44,9 +43,9 @@ if (isset($_POST['class_name'], $_POST['section'], $_POST['id'])) {
             $check = $conn->prepare("SELECT id FROM classes WHERE class_name=? AND section=? AND id != ?");
             $check->bind_param("ssi", $class_name, $section, $id);
             $check->execute();
-            $result = $check->get_result();
+            $check->store_result();
 
-            if ($result->num_rows > 0) {
+            if ($check->num_rows > 0) {
                 $message = "❌ Class <b>$class_name $section</b> already exists!";
             } else {
                 // Update class
@@ -96,8 +95,9 @@ if (isset($_POST['class_name'], $_POST['section'], $_POST['id'])) {
         <label for="section">Section:</label>
         <input type="text" name="section" id="section" value="<?php echo htmlspecialchars($row['section']); ?>" required>
         <span id="section_error" class="error"></span>
+
         <div class="button-container">
-        <button type="submit" class="btn">Update</button>
+        <button type="submit" name="submit" class="btn">Update</button>
         </div>
     </form>
 

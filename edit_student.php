@@ -13,7 +13,7 @@ $student = [
     'address'=>''
 ];
 
-// Determine if ID is provided via POST (from edit button)
+// Determine if ID is provided via POST 
 $id = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $id = intval($_POST['id']);
@@ -150,7 +150,7 @@ if (isset($_POST['submit'])) {
 <a href="view_students.php" class="btn back">⬅ Back</a>
 
 <script>
-// ✅ JavaScript Validation (same as Add Student)
+//  JavaScript Validation 
 function validateForm() {
     let valid = true;
     document.querySelectorAll(".error").forEach(e => e.textContent = "");
