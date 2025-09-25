@@ -55,7 +55,7 @@ if (isset($_POST['submit'])) {
         } elseif (strlen($address) < 5) {
             $message = "❌ Address too short.";
         } else {
-            // Check for duplicate roll number
+            // Check for duplicate roll number in the same class
             $check = $conn->prepare("SELECT id FROM students WHERE roll_no=? AND class_id=? AND id!=?");
             $check->bind_param("sii", $roll_no, $class_id, $id);
             $check->execute();
@@ -64,32 +64,47 @@ if (isset($_POST['submit'])) {
             if ($check->num_rows > 0) {
                 $message = "❌ Roll number already exists in this class.";
             } else {
-                // Update student
-                $stmt = $conn->prepare("UPDATE students SET name=?, roll_no=?, class_id=?, dob=?, parent_contact=?, address=? WHERE id=?");
-                $stmt->bind_param("ssisssi", $name, $roll_no, $class_id, $dob, $parent_contact, $address, $id);
+                $check->close();
 
-                if ($stmt->execute()) {
-                    $message = "✅ Student updated successfully!";
-                    
+                // 🔹 Check duplicate student (name + parent contact) excluding current ID
+                $check2 = $conn->prepare("SELECT id FROM students WHERE name=? AND parent_contact=? AND id!=?");
+                $check2->bind_param("ssi", $name, $parent_contact, $id);
+                $check2->execute();
+                $check2->store_result();
+
+                if ($check2->num_rows > 0) {
+                    $message = "❌ Student with the same name and parent contact already exists.";
                 } else {
-                    $message = "❌ Error: " . $stmt->error;
+                    // Update student
+                    $stmt = $conn->prepare("UPDATE students 
+                                            SET name=?, roll_no=?, class_id=?, dob=?, parent_contact=?, address=? 
+                                            WHERE id=?");
+                    $stmt->bind_param("ssisssi", $name, $roll_no, $class_id, $dob, $parent_contact, $address, $id);
+
+                    if ($stmt->execute()) {
+                        $message = "✅ Student updated successfully!";
+                    } else {
+                        $message = "❌ Error: " . $stmt->error;
+                    }
+                    $stmt->close();
                 }
-                $stmt->close();
+                $check2->close();
             }
-            $check->close();
         }
-        // refresh form values
+
+        // Refresh form values
         $student = [
-            'id'=>$id,
-            'name'=>$name,
-            'roll_no'=>$roll_no,
-            'class_id'=>$class_id,
-            'dob'=>$dob,
-            'parent_contact'=>$parent_contact,
-            'address'=>$address
+            'id' => $id,
+            'name' => $name,
+            'roll_no' => $roll_no,
+            'class_id' => $class_id,
+            'dob' => $dob,
+            'parent_contact' => $parent_contact,
+            'address' => $address
         ];        
     }
 }
+
 ?>
 
 <!DOCTYPE html>

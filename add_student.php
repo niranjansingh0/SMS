@@ -3,6 +3,7 @@
 <?php
 $message = "";
 
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = trim($_POST['name']);
     $roll_no = trim($_POST['roll_no']);  
@@ -21,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif (strlen($address) < 5) {
         $message = "❌ Address too short.";
     } else {
-        //  Check duplicate roll number within same class
+        // 🔹 Check duplicate roll number within same class
         $check = $conn->prepare("SELECT id FROM students WHERE roll_no = ? AND class_id = ?");
         $check->bind_param("si", $roll_no, $class_id);
         $check->execute();
@@ -30,22 +31,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($check->num_rows > 0) {
             $message = "❌ Roll number already exists in this class.";
         } else {
-            //  Insert into database
-            $stmt = $conn->prepare("INSERT INTO students (name, roll_no, class_id, dob, parent_contact, address) 
-                                    VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssisss", $name, $roll_no, $class_id, $dob, $parent_contact, $address);
+            $check->close();
 
-            if ($stmt->execute()) {
-                $message = "✅ Student added successfully!";
+            // 🔹 Check duplicate student name + parent contact
+            $check2 = $conn->prepare("SELECT id FROM students WHERE name = ? AND parent_contact = ?");
+            $check2->bind_param("ss", $name, $parent_contact);
+            $check2->execute();
+            $check2->store_result();
+
+            if ($check2->num_rows > 0) {
+                $message = "❌ Student with this name and parent contact already exists.";
             } else {
-                $message = "❌ Error: " . $stmt->error;
+                // ✅ Insert into database
+                $stmt = $conn->prepare("INSERT INTO students (name, roll_no, class_id, dob, parent_contact, address) 
+                                        VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssisss", $name, $roll_no, $class_id, $dob, $parent_contact, $address);
+
+                if ($stmt->execute()) {
+                    $message = "✅ Student added successfully!";
+                } else {
+                    $message = "❌ Error: " . $stmt->error;
+                }
+                $stmt->close();
             }
-            $stmt->close();
+            $check2->close();
         }
-        $check->close();
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html>

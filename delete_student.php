@@ -2,16 +2,26 @@
 include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-    $id = intval($_POST['id']);
+    $student_id = intval($_POST['id']);
 
-    // Delete student using prepared statement
+    // Prepare delete query
     $stmt = $conn->prepare("DELETE FROM students WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
-}
+    $stmt->bind_param("i", $student_id);
 
-// Redirect back to the students view page
-header("Location: view_students.php");
-exit();
+    if ($stmt->execute()) {
+        // Redirect with success
+        header("Location: view_students.php?msg=deleted");
+        exit();
+    } else {
+        // Redirect with error
+        header("Location: view_students.php?msg=error");
+        exit();
+    }
+
+    $stmt->close();
+} else {
+    // If accessed directly without POST id
+    header("Location: view_students.php");
+    exit();
+}
 ?>

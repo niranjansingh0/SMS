@@ -10,6 +10,17 @@ include 'db.php';
 <body>
     <h2>📋 Student Records</h2>
 
+    <?php
+    if (isset($_GET['msg'])) {
+        if ($_GET['msg'] == 'deleted') {
+            echo "<p class='center-message' style='color:green;'>✅ Student deleted successfully.</p>";
+        } elseif ($_GET['msg'] == 'error') {
+            echo "<p class='center-message' style='color:red;'>❌ Error deleting student. Please try again.</p>";
+        }
+    }
+    ?>
+    
+
     <!-- Filter by class -->
     <form method="POST" class="form">
         <label for="class_id">Filter by Class:</label>

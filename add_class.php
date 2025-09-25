@@ -20,9 +20,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $check = $conn->prepare("SELECT id FROM classes WHERE class_name = ? AND section = ?");
         $check->bind_param("ss", $class_name, $section);
         $check->execute();
-        $result = $check->get_result();
+        $check->store_result();
 
-        if ($result->num_rows > 0) {
+        if ($check->num_rows > 0) {
             $message = "❌ Class <b>$class_name $section</b> already exists!";
         } else {
             //  Insert new class if not exists

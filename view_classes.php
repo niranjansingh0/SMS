@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <?php
+
+   <h2 style="text-align:center;">📖 Class List</h2>
+   
+   <?php
     if (isset($_GET['msg'])) {
         if ($_GET['msg'] == "deleted") {
             echo "<p style='color:green; text-align:center;'>✅ Class deleted successfully.</p>";
@@ -18,7 +21,6 @@
     }
     ?>
     
-    <h2 style="text-align:center;">📖 Class List</h2>
 
     <table>
         <tr>
