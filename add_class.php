@@ -3,9 +3,10 @@
 <?php
 $message = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $class_name = trim($_POST['class_name']);
-    $section = trim($_POST['section']);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $class_name = trim(isset($_POST['class_name']) ? $_POST['class_name'] : '');
+    $section    = trim(isset($_POST['section']) ? $_POST['section'] : '');
+
 
     // PHP Validation
     if ($class_name == "" || $section == "") {
@@ -15,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!preg_match("/^[A-Za-z]$/", $section)) {
         $message = "❌ Section must be a single letter.";
     } else {
-        // 🔍 Check if class + section already exists
+        //  Check if class + section already exists
         $check = $conn->prepare("SELECT id FROM classes WHERE class_name = ? AND section = ?");
         $check->bind_param("ss", $class_name, $section);
         $check->execute();
@@ -24,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows > 0) {
             $message = "❌ Class <b>$class_name $section</b> already exists!";
         } else {
-            // ✅ Insert new class if not exists
+            //  Insert new class if not exists
             $stmt = $conn->prepare("INSERT INTO classes (class_name, section) VALUES (?, ?)");
             $stmt->bind_param("ss", $class_name, $section);
 

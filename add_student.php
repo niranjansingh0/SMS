@@ -3,7 +3,7 @@
 <?php
 $message = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = trim($_POST['name']);
     $roll_no = trim($_POST['roll_no']);  
     $class_id = intval($_POST['class_id']);

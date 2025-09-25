@@ -70,16 +70,7 @@ if (isset($_POST['submit'])) {
 
                 if ($stmt->execute()) {
                     $message = "✅ Student updated successfully!";
-                    // refresh form values
-                    $student = [
-                        'id'=>$id,
-                        'name'=>$name,
-                        'roll_no'=>$roll_no,
-                        'class_id'=>$class_id,
-                        'dob'=>$dob,
-                        'parent_contact'=>$parent_contact,
-                        'address'=>$address
-                    ];
+                    
                 } else {
                     $message = "❌ Error: " . $stmt->error;
                 }
@@ -87,6 +78,16 @@ if (isset($_POST['submit'])) {
             }
             $check->close();
         }
+        // refresh form values
+        $student = [
+            'id'=>$id,
+            'name'=>$name,
+            'roll_no'=>$roll_no,
+            'class_id'=>$class_id,
+            'dob'=>$dob,
+            'parent_contact'=>$parent_contact,
+            'address'=>$address
+        ];        
     }
 }
 ?>
@@ -111,9 +112,11 @@ if (isset($_POST['submit'])) {
 
     <label for="name">Name:</label>
     <input type="text" name="name" id="name" value="<?php echo htmlspecialchars($student['name']); ?>" required>
+    <span id="name_error" class="error"></span>
 
     <label for="roll_no">Roll No:</label>
     <input type="text" name="roll_no" id="roll_no" value="<?php echo htmlspecialchars($student['roll_no']); ?>" required>
+    <span id="roll_error" class="error"></span>
 
     <label for="class_id">Class:</label>
     <select name="class_id" id="class_id" required>
@@ -125,47 +128,72 @@ if (isset($_POST['submit'])) {
         }
         ?>
     </select>
+    <span id="class_error" class="error"></span>
 
     <label for="dob">DOB:</label>
     <input type="date" name="dob" id="dob" value="<?php echo $student['dob']; ?>" required>
+    <span id="dob_error" class="error"></span>
 
     <label for="parent_contact">Parent Contact:</label>
     <input type="text" name="parent_contact" id="parent_contact" value="<?php echo $student['parent_contact']; ?>" required>
+    <span id="phone_error" class="error"></span>
 
     <label for="address">Address:</label>
     <textarea name="address" id="address" required><?php echo htmlspecialchars($student['address']); ?></textarea>
+    <span id="address_error" class="error"></span>
+
     <div class="button-container">
-    <button type="submit" name="submit" class="btn">Update Student</button>
+        <button type="submit" name="submit" class="btn">Update Student</button>
     </div>
 </form>
 
 <a href="view_students.php" class="btn back">⬅ Back</a>
+
 <script>
-function validateForm(){
-    let valid=true;
-    document.querySelectorAll(".error").forEach(e=>e.textContent='');
+// ✅ JavaScript Validation (same as Add Student)
+function validateForm() {
+    let valid = true;
+    document.querySelectorAll(".error").forEach(e => e.textContent = "");
 
-    let name=document.getElementById("name").value;
-    if(!/^[A-Za-z ]+$/.test(name)){valid=false;}
+    let name = document.getElementById("name").value;
+    if (!/^[A-Za-z ]+$/.test(name)) {
+        document.getElementById("name_error").textContent = "Name must contain only letters and spaces.";
+        valid = false;
+    }
 
-    let roll=document.getElementById("roll_no").value;
-    if(!/^[0-9]+$/.test(roll)){valid=false;}
+    let roll = document.getElementById("roll_no").value;
+    if (!/^[0-9]+$/.test(roll)) {
+        document.getElementById("roll_error").textContent = "Roll Number must be numeric.";
+        valid = false;
+    }
 
-    let class_id=document.getElementById("class_id").value;
-    if(class_id===""){valid=false;}
+    let class_id = document.getElementById("class_id").value;
+    if (class_id === "") {
+        document.getElementById("class_error").textContent = "Please select a class.";
+        valid = false;
+    }
 
-    let dob=new Date(document.getElementById("dob").value);
-    let today=new Date();
-    let age=today.getFullYear()-dob.getFullYear();
-    let m=today.getMonth()-dob.getMonth();
-    if(m<0||(m===0 && today.getDate()<dob.getDate())){age--;}
-    if(age<3||age>20){valid=false;}
+    let dob = new Date(document.getElementById("dob").value);
+    let today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    let m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) { age--; }
+    if (age < 3 || age > 20) {
+        document.getElementById("dob_error").textContent = "Age must be between 3 and 20 years.";
+        valid = false;
+    }
 
-    let phone=document.getElementById("parent_contact").value;
-    if(!/^[0-9]{10}$/.test(phone)){valid=false;}
+    let phone = document.getElementById("parent_contact").value;
+    if (!/^[0-9]{10}$/.test(phone)) {
+        document.getElementById("phone_error").textContent = "Enter a valid 10-digit phone number.";
+        valid = false;
+    }
 
-    let address=document.getElementById("address").value.trim();
-    if(address.length<5){valid=false;}
+    let address = document.getElementById("address").value.trim();
+    if (address.length < 5) {
+        document.getElementById("address_error").textContent = "Address must be at least 5 characters.";
+        valid = false;
+    }
 
     return valid;
 }

@@ -6,7 +6,7 @@ $row = ['id'=>'','class_name'=>'','section'=>'']; // default values
 
 $id = null;
 
-// Load class data if ID exists via POST (from edit button)
+// Load class data if ID exists via POST 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $id = intval($_POST['id']);
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     }
 }
 
-// Handle form submission (only allow update if ID exists)
+// Handle form submission 
 if (isset($_POST['class_name'], $_POST['section'], $_POST['id'])) {
     if (empty($_POST['id']) || $id === null) {
         $message = "❌ Class not found.";
